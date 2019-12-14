@@ -36,7 +36,7 @@ Will crawl the website located at http://localhost:1313 and all its dependencies
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/geoffreybauduin/website-checker/)
+See [CONTRIBUTING.md](https://github.com/geoffreybauduin/website-checker/blob/master/CONTRIBUTING.md)
 
 ## License
 
