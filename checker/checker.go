@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/schollz/progressbar/v2"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,6 +19,8 @@ type checker struct {
 	result          *CheckResult
 	ignoreRegexps   []*regexp.Regexp
 	inspectExternal bool
+	checked         int
+	total           int
 }
 
 type checkTask struct {
@@ -79,6 +83,7 @@ func (c *checker) addUrlToCheck(urlToAdd string, from *url.URL) (string, error) 
 		logrus.Debugf("url is ignored")
 		return urlToAdd, nil
 	}
+	c.total++
 	c.toCheck = append(c.toCheck, checkTask{url: urlToAdd, from: from})
 	return urlToAdd, nil
 }
@@ -112,12 +117,16 @@ func (c *checker) Run() (*CheckResult, error) {
 	for _, url := range c.URLs {
 		c.addUrlToCheck(url, nil)
 	}
-	checked := 0
+	bar := progressbar.NewOptions(
+		c.total,
+		progressbar.OptionSetWriter(os.Stderr),
+		progressbar.OptionShowCount(),
+	)
 	for len(c.toCheck) > 0 {
-		logrus.Infof("%d checked, %d remaining", checked, len(c.toCheck))
+		logrus.Debugf("%d checked, %d remaining", c.checked, len(c.toCheck))
 		task := c.toCheck[0]
 		if !c.alreadyChecked(task.url) {
-			logrus.Infof(task.url)
+			logrus.Debug(task.url)
 			err := c.runCheck(task)
 			if err != nil {
 				return nil, err
@@ -126,7 +135,9 @@ func (c *checker) Run() (*CheckResult, error) {
 			logrus.Debugf("already checked")
 		}
 		c.toCheck = c.toCheck[1:]
-		checked++
+		c.checked++
+		bar.ChangeMax(c.total)
+		bar.Add(1)
 	}
 	return c.result, nil
 }
@@ -148,7 +159,6 @@ func (c *checker) runCheck(task checkTask) error {
 	}
 	defer resp.Body.Close()
 	if c.inspectExternal == false && task.isExternalLink() {
-		logger.Warnf("is external")
 		return nil
 	}
 	doc, errDoc := goquery.NewDocumentFromReader(resp.Body)
