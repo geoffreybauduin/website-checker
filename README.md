@@ -21,6 +21,7 @@ Checks 404 and other stuff by crawling your website
 
 Flags:
   --help                         Show context-sensitive help (also try --help-long and --help-man).
+  --workers=10                   Number of workers to perform the work
   --urls=URLS ...                URLs to check
   --ignore-urls=IGNORE-URLS ...  Ignore those URLs and do not attempt to fetch them. Expecting a regexp
   --no-external-inspection       Do not inspect external urls
@@ -29,10 +30,13 @@ Flags:
 ### Explained examples
 
 ```
-website-checker --urls http://localhost:1313 --no-external-inspection --ignore-urls "^https://docs\.google\.com"
+website-checker --urls http://localhost:1313 --no-external-inspection --ignore-urls "^https://docs\.google\.com" --workers=5
 ```
 
-Will crawl the website located at http://localhost:1313 and all its dependencies. Will not fetch the dependencies from the pages that are outside of the host `localhost:1313`. Any url starting with `https://docs.google.com` will be ignored.
+- Will crawl the website located at http://localhost:1313 and all its dependencies.
+- Will not fetch the dependencies from the pages that are outside of the host `localhost:1313`.
+- Any url starting with `https://docs.google.com` will be ignored.
+- Will perform 5 tasks in parallel
 
 ## Contributing
 

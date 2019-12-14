@@ -17,6 +17,7 @@ func main() {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 	app := kingpin.New("website-checker", "Checks 404 and other stuff by crawling your website")
+	workers := app.Flag("workers", "Number of workers to perform the work").Default("10").Int()
 	urls := app.Flag("urls", "URLs to check").Required().Strings()
 	ignore := app.Flag("ignore-urls", "Ignore those URLs and do not attempt to fetch them. Expecting a regexp").Strings()
 	noExternalInspection := app.Flag("no-external-inspection", "Do not inspect external urls").Bool()
@@ -48,6 +49,7 @@ func main() {
 	if noExternalInspection != nil && *noExternalInspection {
 		c.NoExternalInspection()
 	}
+	c.Workers(*workers)
 
 	res, err := c.Run()
 	if err != nil {
