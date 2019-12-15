@@ -90,25 +90,25 @@ func (task *httptask) Execute(c *checker) (*result, error) {
 	return res, nil
 }
 
-func (h httptask) isExternalLink() bool {
-	if h.from == nil {
+func (task httptask) isExternalLink() bool {
+	if task.from == nil {
 		return false
 	}
-	part := fmt.Sprintf("%s://%s", h.from.Scheme, h.from.Host)
-	return !strings.HasPrefix(h.url, part)
+	part := fmt.Sprintf("%s://%s", task.from.Scheme, task.from.Host)
+	return !strings.HasPrefix(task.url, part)
 }
 
-func (h httptask) alreadyChecked(c *checker) bool {
+func (task httptask) alreadyChecked(c *checker) bool {
 	c.result.RLock()
-	_, ok := c.result.Checked[h.url]
-	if !ok && !strings.HasSuffix(h.url, "/") {
-		_, ok = c.result.Checked[fmt.Sprintf("%s/", h.url)]
+	_, ok := c.result.Checked[task.url]
+	if !ok && !strings.HasSuffix(task.url, "/") {
+		_, ok = c.result.Checked[fmt.Sprintf("%s/", task.url)]
 	}
 	c.result.RUnlock()
 	return ok
 }
 
-func (h httptask) addUrlToCheck(c *checker, urlToAdd string, from *url.URL) (string, error) {
+func (task httptask) addUrlToCheck(c *checker, urlToAdd string, from *url.URL) (string, error) {
 	if strings.HasPrefix(urlToAdd, "/") {
 		urlToAdd = fmt.Sprintf("//%s%s", from.Host, urlToAdd)
 	}

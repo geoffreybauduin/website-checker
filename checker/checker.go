@@ -22,6 +22,7 @@ type checker struct {
 	options *Options
 }
 
+// Options is a list of options to start a Checker
 type Options struct {
 	Workers                       int
 	IgnoreRegexps                 []*regexp.Regexp
@@ -31,6 +32,7 @@ type Options struct {
 	YandexAPIKey                  string
 }
 
+// New instantiates a new Checker using options
 func New(o *Options) Checker {
 	return &checker{
 		options: o,
@@ -65,6 +67,7 @@ func (e errors) Error() string {
 	return strings.Join(m, ", ")
 }
 
+// Run runs the checker
 func (c *checker) Run() (*CheckResult, error) {
 	if c.result != nil {
 		return c.result, nil

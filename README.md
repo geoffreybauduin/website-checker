@@ -1,5 +1,7 @@
 # website-checker
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/geoffreybauduin/website-checker)](https://goreportcard.com/report/github.com/geoffreybauduin/website-checker)
+
 Performs multiple checks against your website, mostly:
 
 - Goes through every `img`, `script`, `a`, `link[rel="stylesheet"]` tags, and stores the availability of the resource
