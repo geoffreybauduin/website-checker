@@ -21,6 +21,8 @@ func main() {
 	urls := app.Flag("urls", "URLs to check").Required().Strings()
 	ignore := app.Flag("ignore-urls", "Ignore those URLs and do not attempt to fetch them. Expecting a regexp").Strings()
 	noExternalInspection := app.Flag("no-external-inspection", "Do not inspect external urls").Bool()
+	checkStructuredData := app.Flag("check-structured-data", "Check structured data validity").Enum("yandex")
+	yandexAPIKey := app.Flag("yandex-api-key", "Yandex API Key").String()
 
 	if os.Getenv("DEBUG") == "1" {
 		logrus.SetLevel(logrus.DebugLevel)
@@ -32,9 +34,17 @@ func main() {
 		return
 	}
 
-	c := checker.New()
+	opts := &checker.Options{
+		URLs:            make([]string, 0),
+		IgnoreRegexps:   make([]*regexp.Regexp, 0),
+		InspectExternal: true,
+		Workers:         *workers,
+	}
+	if noExternalInspection != nil && *noExternalInspection {
+		opts.InspectExternal = false
+	}
 	for _, url := range *urls {
-		c.AddURL(url)
+		opts.URLs = append(opts.URLs, url)
 	}
 	if ignore != nil {
 		for _, ig := range *ignore {
@@ -43,14 +53,21 @@ func main() {
 				exit(err)
 				return
 			}
-			c.Ignore(rex)
+			opts.IgnoreRegexps = append(opts.IgnoreRegexps, rex)
 		}
 	}
-	if noExternalInspection != nil && *noExternalInspection {
-		c.NoExternalInspection()
+	if checkStructuredData != nil {
+		switch *checkStructuredData {
+		case "yandex":
+			opts.StructuredDataCheckWithYandex = true
+			if yandexAPIKey == nil {
+				exit(fmt.Errorf("missing yandex-api-key parameter"))
+			}
+			opts.YandexAPIKey = *yandexAPIKey
+		}
 	}
-	c.Workers(*workers)
 
+	c := checker.New(opts)
 	res, err := c.Run()
 	if err != nil {
 		exit(err)

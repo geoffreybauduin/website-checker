@@ -12,38 +12,29 @@ import (
 )
 
 type checker struct {
-	URLs            []string
-	tasks           []task
-	result          *CheckResult
-	ignoreRegexps   []*regexp.Regexp
-	inspectExternal bool
-	checked         int
-	total           int
-	lock            sync.RWMutex
-	pool            *tunny.Pool
-	wg              sync.WaitGroup
-	workers         int
+	tasks   []task
+	result  *CheckResult
+	checked int
+	total   int
+	lock    sync.RWMutex
+	pool    *tunny.Pool
+	wg      sync.WaitGroup
+	options *Options
 }
 
-func New() Checker {
+type Options struct {
+	Workers                       int
+	IgnoreRegexps                 []*regexp.Regexp
+	URLs                          []string
+	InspectExternal               bool
+	StructuredDataCheckWithYandex bool
+	YandexAPIKey                  string
+}
+
+func New(o *Options) Checker {
 	return &checker{
-		URLs:            make([]string, 0),
-		ignoreRegexps:   make([]*regexp.Regexp, 0),
-		inspectExternal: true,
-		workers:         10,
+		options: o,
 	}
-}
-
-func (c *checker) NoExternalInspection() {
-	c.inspectExternal = false
-}
-
-func (c *checker) Ignore(re *regexp.Regexp) {
-	c.ignoreRegexps = append(c.ignoreRegexps, re)
-}
-
-func (c *checker) Workers(w int) {
-	c.workers = w
 }
 
 func (c *checker) addTask(t task) {
@@ -56,16 +47,12 @@ func (c *checker) addTask(t task) {
 }
 
 func (c *checker) isIgnored(url string) bool {
-	for _, re := range c.ignoreRegexps {
+	for _, re := range c.options.IgnoreRegexps {
 		if re.MatchString(url) {
 			return true
 		}
 	}
 	return false
-}
-
-func (c *checker) AddURL(url string) {
-	c.URLs = append(c.URLs, url)
 }
 
 type errors []error
@@ -86,13 +73,13 @@ func (c *checker) Run() (*CheckResult, error) {
 		Checked: map[string]*result{},
 	}
 	bar := progressbar.NewOptions(
-		len(c.URLs),
+		len(c.options.URLs),
 		progressbar.OptionSetWriter(os.Stderr),
 		progressbar.OptionShowCount(),
 	)
 	mu := sync.RWMutex{}
 	errs := make(errors, 0)
-	c.pool = tunny.NewFunc(c.workers, func(in interface{}) interface{} {
+	c.pool = tunny.NewFunc(c.options.Workers, func(in interface{}) interface{} {
 		defer c.wg.Done()
 		t := in.(task)
 		_, err := t.Execute(c)
@@ -106,7 +93,7 @@ func (c *checker) Run() (*CheckResult, error) {
 		}
 		return err
 	})
-	for _, url := range c.URLs {
+	for _, url := range c.options.URLs {
 		c.addTask(&httptask{url: url, from: nil})
 	}
 	go func() {

@@ -4,12 +4,13 @@ Performs multiple checks against your website, mostly:
 
 - Goes through every `img`, `script`, `a`, `link[rel="stylesheet"]` tags, and stores the availability of the resource
 - Stores a map of the dependencies between each resource
+- Can perform validation of structured data using [Yandex Structured Data Validator](https://tech.yandex.com/validator/doc/dg/concepts/about-docpage/)
 
 ## Installation
 
 ```
 go get -u github.com/geoffreybauduin/website-checker
-go install github.com/geoffreybauduin/website-checker
+go install github.com/geoffreybauduin/website-checker/cmd/website-checker
 ```
 
 ## Usage
@@ -25,18 +26,23 @@ Flags:
   --urls=URLS ...                URLs to check
   --ignore-urls=IGNORE-URLS ...  Ignore those URLs and do not attempt to fetch them. Expecting a regexp
   --no-external-inspection       Do not inspect external urls
+  --check-structured-data=CHECK-STRUCTURED-DATA  
+                                 Check structured data validity
+  --yandex-api-key=YANDEX-API-KEY  
+                                 Yandex API Key
 ```
 
 ### Explained examples
 
 ```
-website-checker --urls http://localhost:1313 --no-external-inspection --ignore-urls "^https://docs\.google\.com" --workers=5
+website-checker --urls http://localhost:1313 --no-external-inspection --ignore-urls "^https://docs\.google\.com" --workers=5 --check-structured-data=yandex --yandex-api-key=1234
 ```
 
 - Will crawl the website located at http://localhost:1313 and all its dependencies.
 - Will not fetch the dependencies from the pages that are outside of the host `localhost:1313`.
 - Any url starting with `https://docs.google.com` will be ignored.
 - Will perform 5 tasks in parallel
+- Will fetch any `application/ld+json` script tags and perform validation of those against Yandex API, using the api key `1234`
 
 ## Contributing
 

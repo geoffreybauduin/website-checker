@@ -34,7 +34,7 @@ func (task *httptask) Execute(c *checker) (*result, error) {
 		StatusCode: resp.StatusCode,
 	}
 	defer resp.Body.Close()
-	if c.inspectExternal == false && task.isExternalLink() {
+	if !c.options.InspectExternal && task.isExternalLink() {
 		return nil, nil
 	}
 	doc, errDoc := goquery.NewDocumentFromReader(resp.Body)
@@ -81,6 +81,9 @@ func (task *httptask) Execute(c *checker) (*result, error) {
 			res.registerLink(urlAdded)
 		}
 	})
+	doc.Find(`script[type="application/ld+json"]`).Each(func(_ int, s *goquery.Selection) {
+		c.addTask(&structureddatatask{from: req.URL, txt: s.Text()})
+	})
 	c.result.Lock()
 	c.result.Checked[task.url] = res
 	c.result.Unlock()
@@ -98,6 +101,9 @@ func (h httptask) isExternalLink() bool {
 func (h httptask) alreadyChecked(c *checker) bool {
 	c.result.RLock()
 	_, ok := c.result.Checked[h.url]
+	if !ok && !strings.HasSuffix(h.url, "/") {
+		_, ok = c.result.Checked[fmt.Sprintf("%s/", h.url)]
+	}
 	c.result.RUnlock()
 	return ok
 }

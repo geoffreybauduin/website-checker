@@ -13,6 +13,11 @@ github.com/andybalholm/cascadia v1.1.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9Pq
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/geoffreybauduin/yandex-structured-data-validator v0.0.0-20191215145943-859819e057b3 h1:889DxcCAJTl0UQrnXp23s5bzRC9PTr/OnRusWOXVqvQ=
+github.com/geoffreybauduin/yandex-structured-data-validator v0.0.0-20191215150157-f8d1d031ebba h1:mz+uqO1C5gd7lIPcBwxRzs7u9qWilMeKHaPJSOBD6sU=
+github.com/geoffreybauduin/yandex-structured-data-validator v0.0.0-20191215150157-f8d1d031ebba/go.mod h1:ikoLFdyGrXOlvdwK3S+age7yfCa3Fopa37yFkRdsKMg=
+github.com/geoffreybauduin/yandex-structured-data-validator v0.0.0-20191215154516-6e1df7e961db h1:qnXknv3m75YY+qrf2fm6qSd/gLtYpHbyZlP792vQ2kk=
+github.com/geoffreybauduin/yandex-structured-data-validator v0.0.0-20191215154516-6e1df7e961db/go.mod h1:ikoLFdyGrXOlvdwK3S+age7yfCa3Fopa37yFkRdsKMg=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1 h1:mweAR1A6xJ3oS2pRaGiHgQ4OO8tzTaLawm8vnODuwDk=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2 h1:DB17ag19krx9CFsz4o3enTrPXyIXCl+2iCXH/aMAp9s=
